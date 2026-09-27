@@ -1,20 +1,31 @@
 #!/bin/sh
+set -eu
 
-# Esperar a que el servicio ADB esté listo
-echo "Esperando conexión con el emulador Android..."
-while ! adb connect android:5555; do
+ANDROID_HOST="${ANDROID_HOST:-android}"
+ANDROID_PORT="${ANDROID_PORT:-5555}"
+APK_PATH="${APK_PATH:-/scripts/gd-lite.apk}"
+PACKAGE_NAME="com.robtopx.geometryjumplite"
+ACTIVITY_NAME="com.robtopx.geometryjumplite.GeometryDashLite"
+
+echo "Esperando conexión con Android en ${ANDROID_HOST}:${ANDROID_PORT}..."
+
+while ! adb connect "${ANDROID_HOST}:${ANDROID_PORT}" >/dev/null 2>&1; do
   sleep 2
 done
 
-echo "Conectado exitosamente a Android."
+echo "Conectado exitosamente con Android."
 
-# Instalar APK de Geometry Dash Lite si no está instalado
-# Reemplaza la ruta si descargas el APK localmente
-echo "Verificando instalación de Geometry Dash Lite..."
-# adb install -r /scripts/gd-lite.apk
+if [ ! -f "${APK_PATH}" ]; then
+  echo "ERROR: No se encontró el APK en ${APK_PATH}."
+  echo "Coloca un APK de Geometry Dash Lite que tengas derecho a usar en esa ruta."
+  exit 1
+fi
 
-# Lanzar Geometry Dash Lite automáticamente (Modo Kiosko)
-# com.robtopx.geometrydashlite/com.robtopx.geometrydashlite.GeometryDashLite
-adb shell am start -n com.robtopx.geometrydashlite/com.robtopx.geometrydashlite.GeometryDashLite
+echo "Instalando Geometry Dash Lite desde ${APK_PATH}..."
+adb install -r "${APK_PATH}"
 
-echo "Geometry Dash Lite iniciado en modo Kiosko."
+echo "Iniciando Geometry Dash Lite..."
+adb shell am force-stop "${PACKAGE_NAME}" || true
+adb shell monkey -p "${PACKAGE_NAME}" 1 >/dev/null
+
+echo "Geometry Dash Lite iniciado."
