@@ -1,0 +1,2 @@
+GDLite Android backend placeholder.
+This file keeps the emulator directory present in the repository.
