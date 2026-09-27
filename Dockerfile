@@ -10,8 +10,8 @@ ENV APK_PATH="/scripts/gd-lite.apk"
 ENV ANDROID_PACKAGE="com.robtopx.geometryjumplite"
 
 # The APK is supplied separately and is not distributed by this repository.
+# Run it explicitly with bash because the base image does not allow chmod here.
 COPY scripts/start-gdlite.sh /scripts/start-gdlite.sh
-RUN chmod +x /scripts/start-gdlite.sh
 
 # Start Android, expose noVNC, then install/launch the supplied APK when present.
-CMD ["/scripts/start-gdlite.sh"]
+CMD ["/bin/bash", "/scripts/start-gdlite.sh"]
