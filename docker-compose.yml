@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  # Contenedor Android-x86 (Redroid)
+  android:
+    image: redroid/redroid:11.0.0-latest
+    container_name: gd_android
+    stdin_open: true
+    tty: true
+    privileged: true
+    ports:
+      - "5555:5555"
+    volumes:
+      - ./scripts:/scripts
+      - android-data:/data
+    command:
+      - androidboot.hardware=redroid
+      - redroid.width=1280
+      - redroid.height=720
+      - redroid.fps=60
+    restart: always
+
+  # Servidor de streaming WebRTC (Scrcpy Web)
+  scrcpy-web:
+    image: wsreact/scrcpy-web:latest
+    container_name: gd_scrcpy_web
+    ports:
+      - "8000:8000"
+    depends_on:
+      - android
+    environment:
+      - ADB_HOST=android
+      - ADB_PORT=5555
+    restart: always
+
+volumes:
+  android-data:
