@@ -4,11 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const streamPlayer = document.getElementById('stream-player');
   const connectionStatus = document.getElementById('connection-status');
 
-  // GitHub Pages only hosts the frontend. A real Android streaming backend
-  // can be supplied with window.GDLITE_EMULATOR_URL.
-  // The local fallback is a real file, not a directory URL, so GitHub Pages
-  // does not depend on directory-index behavior.
-  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || './emulator/emulator.html';
+  // GitHub Pages hosts the frontend. Render hosts the beta Android/noVNC backend.
+  // Override this value with window.GDLITE_EMULATOR_URL when using another backend.
+  const EMULATOR_URL =
+    window.GDLITE_EMULATOR_URL ||
+    'https://gd-lite-backend.onrender.com/';
 
   function setStatus(message, state = 'loading') {
     if (!connectionStatus) return;
@@ -16,40 +16,38 @@ document.addEventListener('DOMContentLoaded', () => {
     connectionStatus.dataset.state = state;
   }
 
-  function showBackendPlaceholder() {
+  function showBackendUnavailable() {
     streamPlayer.innerHTML = `
       <div class="emulator-offline">
-        <h2>Android emulator no disponible</h2>
-        <p>La ruta de prueba está disponible, pero todavía no hay un servidor Android conectado.</p>
-        <small>El APK debe ejecutarse dentro de un entorno Android; GitHub Pages solo sirve esta interfaz.</small>
+        <h2>Android backend no disponible</h2>
+        <p>La interfaz web funciona, pero el servidor Android todavía no responde.</p>
+        <small>Comprueba el servicio de Render y sus logs de arranque.</small>
       </div>
     `;
-
-    setStatus('Esperando servidor Android…', 'error');
-    console.warn('[GDLite] No Android streaming endpoint configured.');
+    setStatus('Backend Android no disponible.', 'error');
   }
 
   function loadEmulator() {
-    setStatus('Abriendo emulador…', 'loading');
+    setStatus('Conectando con Android…', 'loading');
     streamPlayer.innerHTML = '';
 
     const iframe = document.createElement('iframe');
     iframe.src = EMULATOR_URL;
     iframe.title = 'GDLite Android Emulator';
-    iframe.allow = 'fullscreen; autoplay';
+    iframe.allow = 'fullscreen; autoplay; keyboard';
     iframe.allowFullscreen = true;
     iframe.referrerPolicy = 'no-referrer';
     iframe.loading = 'eager';
 
     iframe.addEventListener('load', () => {
-      setStatus('Interfaz del emulador cargada.', 'ok');
-      console.log('[GDLite] Emulator endpoint loaded:', EMULATOR_URL);
+      setStatus('Interfaz Android cargada.', 'ok');
+      console.log('[GDLite] Android backend loaded:', EMULATOR_URL);
     });
 
     iframe.addEventListener('error', () => {
-      setStatus('No se pudo cargar el emulador.', 'error');
-      console.error('[GDLite] Emulator endpoint failed:', EMULATOR_URL);
-      showBackendPlaceholder();
+      setStatus('No se pudo conectar con Android.', 'error');
+      console.error('[GDLite] Android backend failed:', EMULATOR_URL);
+      showBackendUnavailable();
     });
 
     streamPlayer.appendChild(iframe);
