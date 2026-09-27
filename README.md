@@ -1,102 +1,71 @@
 # 🎮 GDLite Web Edition — Open Source Beta
 
-GDLite Web Edition es un proyecto experimental que intenta ejecutar una versión de **Geometry Dash Lite para Android** desde una interfaz web. La web está pensada como frontend y el proyecto incluye configuraciones para probar un backend Android mediante Docker.
+GDLite Web Edition es un proyecto experimental para ejecutar una versión de Geometry Dash Lite para Android desde una interfaz web. El repositorio separa el frontend estático del backend Android.
 
-> ⚠️ **Estado actual:** beta experimental. GitHub Pages solamente sirve la interfaz web; no ejecuta Android ni el APK. La carpeta `emulator/` contiene una página placeholder para evitar errores 404 mientras no exista un backend de streaming conectado.
+> ⚠️ Estado: beta experimental. GitHub Pages solo sirve el frontend; no ejecuta Android, Docker, ADB ni APKs.
 
-## 🚀 Características
-
-- 🌐 Interfaz web estática compatible con GitHub Pages.
-- 🛡️ Aviso de seguridad antes de iniciar la sesión.
-- 📡 Estado de conexión del backend.
-- 🖥️ Carga de un endpoint Android mediante `iframe`.
-- 🧪 Ruta `/emulator/` disponible como fallback de prueba.
-- 🐳 Dockerfile preparado para un entorno Android.
-- 🔌 Docker Compose con Android/Redroid y un servicio de streaming.
-- 📱 Soporte para proporcionar un APK externamente, sin incluirlo en el repositorio.
-
-## 🧩 Cómo funciona
-
-La arquitectura de la beta está separada en varias partes:
-
+## 🧱 Arquitectura
 ```
-Navegador
-   ↓
-GitHub Pages
-   ↓
-Frontend (index.html + app.js + styles.css)
-   ↓
-Backend Android / streaming
-   ↓
-Android
-   ↓
-APK de GDLite
+Navegador → GitHub Pages → Backend Android → Android + APK externo
+                         ├─ Redroid
+                         ├─ ADB
+                         └─ scrcpy-web / streaming
 ```
 
-**Importante:** un APK por sí solo no sustituye Android. El APK necesita un entorno Android para ejecutarse.
+## 🚀 Funciones
+- 🖥️ Android accesible desde navegador mediante backend de streaming.
+- 🖱️ Hooks de click/pointer.
+- ⌨️ Hooks de teclado (`keydown`/`keyup`).
+- 📱 Controles táctiles básicos para móvil.
+- 🔌 URL configurable para el backend.
+- ❤️ Health check opcional mediante `/health`.
+- 📊 Panel de estado Android / ADB / streaming.
+- 🔄 Reconexión automática.
+- 📝 Logs del frontend y diagnóstico.
+- 🧪 `scripts/diagnose-android.sh`.
+- 🐳 Docker Compose reproducible.
+- 📚 Documentación.
+- 🔐 APK externo; no se almacena en el repositorio.
 
-## 📁 Estructura principal
+## 🖱️ Input
+El frontend prepara eventos `keyDown`, `keyUp`, `pointerDown` y `pointerUp` mediante `postMessage`. El backend/streaming debe implementar la traducción real de esos eventos a Android.
 
-- `index.html` — interfaz principal y aviso de seguridad.
-- `styles.css` — estilos de la interfaz.
-- `app.js` — conexión y carga del endpoint Android.
-- `emulator/index.html` — placeholder de la ruta del emulador para evitar 404 durante la beta.
-- `emulator/temp.txt` — marcador de la carpeta del emulador.
-- `Dockerfile` — imagen base para el entorno Android.
-- `docker-compose.yml` — configuración de Android/Redroid y streaming local.
-- `render.yaml` — configuración de prueba para desplegar el backend en Render.
-- `scripts/init-android.sh` — conecta con ADB, instala un APK proporcionado externamente y lo intenta iniciar.
+## ❤️ Health API
+Configura `window.GDLITE_HEALTH_URL` con la URL de `/health` del backend. Si no se configura, el frontend usa el fallback local.
 
-## 🔧 Configurar un backend Android
-
-El frontend puede utilizar una URL de backend personalizada definiendo:
-
-```js
-window.GDLITE_EMULATOR_URL = 'https://tu-backend.example';
+## 🐳 Backend local
+```bash
+docker compose up -d
+docker compose ps
+./scripts/diagnose-android.sh
 ```
 
-Si no se define, la beta utiliza `./emulator/`, que actualmente es solamente el placeholder.
+Dependiendo del host, Redroid/Android puede requerir permisos de contenedor y soporte de virtualización. GitHub Pages no puede ejecutar esta parte.
 
-El backend debe proporcionar realmente una interfaz de Android/streaming. Crear la carpeta `emulator/` en GitHub Pages no convierte esa carpeta en un emulador.
+## 📦 APK externo
+El repositorio no incluye ni distribuye un APK propietario. Para pruebas locales, proporciona un APK que tengas derecho a utilizar en `/scripts/gd-lite.apk`. El paquete puede configurarse mediante `ANDROID_PACKAGE`.
 
-## 📦 APK
+## 📁 Estructura
+- `index.html` — interfaz y controles.
+- `app.js` — conexión, health check, reconexión e input.
+- `styles.css` — interfaz responsive.
+- `docker-compose.yml` — Android + streaming local.
+- `Dockerfile` — imagen experimental basada en docker-android.
+- `scripts/start-gdlite.sh` — arranque experimental.
+- `scripts/diagnose-android.sh` — diagnóstico.
+- `scripts/init-android.sh` — instalación/inicio del APK externo.
+- `emulator/` — páginas frontend de prueba.
+- `render.yaml` — configuración experimental de Render.
 
-El repositorio **no incluye ni distribuye un APK propietario**.
+## 🧪 Estado
+La prioridad es conseguir un backend Android reproducible localmente. Después se puede evaluar un proveedor de hosting compatible.
 
-Para las pruebas locales, coloca un APK de Geometry Dash Lite que tengas derecho a utilizar en la ruta esperada por el script:
-
-```
-/scripts/gd-lite.apk
-```
-
-El script utiliza ADB para instalarlo en el dispositivo Android de prueba.
-
-## 🧪 Beta y limitaciones conocidas
-
-- El backend Android puede no estar disponible durante las pruebas.
-- GitHub Pages no puede ejecutar Docker, Android ni ADB.
-- Render se utiliza como entorno de prueba cuando hay un backend compatible desplegado.
-- El streaming depende de la configuración y disponibilidad del backend.
-- La ruta `/emulator/` es un fallback visual, no un Android real.
-- El proyecto todavía necesita pruebas de extremo a extremo con un backend Android activo.
-
-## 🤝 Cómo colaborar
-
-1. Haz un **Fork** del repositorio.
-2. Crea una rama para tu cambio:
-   ```bash
-   git checkout -b feature/nueva-mejora
-   ```
-3. Realiza tus cambios y crea un commit:
-   ```bash
-   git commit -m "Añade nueva funcionalidad"
-   ```
-4. Publica la rama:
-   ```bash
-   git push origin feature/nueva-mejora
-   ```
-5. Abre un Pull Request.
+## 🤝 Contribuir
+1. Haz un fork.
+2. Crea una rama.
+3. Realiza el cambio.
+4. Prueba localmente.
+5. Abre un Pull Request describiendo el cambio.
 
 ## 📜 Licencia
-
-Este proyecto es de código abierto bajo la licencia **MIT**.
+Este proyecto es de código abierto bajo la licencia MIT.
