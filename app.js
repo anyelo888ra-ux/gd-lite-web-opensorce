@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // GitHub Pages only hosts the frontend. A real Android streaming backend
   // can be supplied with window.GDLITE_EMULATOR_URL.
-  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || './emulator/';
+  // The local fallback is a real file, not a directory URL, so GitHub Pages
+  // does not depend on directory-index behavior.
+  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || './emulator/emulator.html';
 
   function setStatus(message, state = 'loading') {
     if (!connectionStatus) return;
@@ -18,8 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     streamPlayer.innerHTML = `
       <div class="emulator-offline">
         <h2>Android emulator no disponible</h2>
-        <p>La página web está funcionando, pero todavía no hay un servidor Android conectado.</p>
-        <small>La ruta de prueba está disponible mientras configuramos el backend de streaming.</small>
+        <p>La ruta de prueba está disponible, pero todavía no hay un servidor Android conectado.</p>
+        <small>El APK debe ejecutarse dentro de un entorno Android; GitHub Pages solo sirve esta interfaz.</small>
       </div>
     `;
 
@@ -28,25 +30,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadEmulator() {
-    setStatus('Conectando con Android…', 'loading');
+    setStatus('Abriendo emulador…', 'loading');
     streamPlayer.innerHTML = '';
 
     const iframe = document.createElement('iframe');
     iframe.src = EMULATOR_URL;
-    iframe.title = 'GDLite Android';
+    iframe.title = 'GDLite Android Emulator';
     iframe.allow = 'fullscreen; autoplay';
     iframe.allowFullscreen = true;
     iframe.referrerPolicy = 'no-referrer';
     iframe.loading = 'eager';
 
     iframe.addEventListener('load', () => {
-      setStatus('Interfaz de Android cargada.', 'ok');
-      console.log('[GDLite] Android endpoint loaded:', EMULATOR_URL);
+      setStatus('Interfaz del emulador cargada.', 'ok');
+      console.log('[GDLite] Emulator endpoint loaded:', EMULATOR_URL);
     });
 
     iframe.addEventListener('error', () => {
-      setStatus('No se pudo conectar con Android.', 'error');
-      console.error('[GDLite] Android endpoint failed:', EMULATOR_URL);
+      setStatus('No se pudo cargar el emulador.', 'error');
+      console.error('[GDLite] Emulator endpoint failed:', EMULATOR_URL);
       showBackendPlaceholder();
     });
 
