@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Geometry Dash Lite - Web Edition</title>
+  <meta name="description" content="GDLite Web Edition - beta de emulación Android en el navegador.">
+  <title>GDLite Web Edition - Beta</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,33 +13,38 @@
   <div id="security-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
-        <span class="icon">ℚ</span>
+        <span class="icon" aria-hidden="true">⚠</span>
         <h2>AVISO DE SEGURIDAD IMPORTANTE</h2>
       </div>
       <div class="modal-body">
         <p>Estás a punto de entrar a una sesión de emulación pública en la nube.</p>
         <ul>
-          <li>♐ <strong>NO</strong> inicies sesión en Google Play ni en ningún servicio.</li>
-          <li>♘ <strong>NO</strong> ingreses correos, contraseñas ni datos personales.</li>
-          <li>✉ Juega a <strong>Geometry Dash Lite</strong> de forma segura y libre.</li>
+          <li><strong>NO</strong> inicies sesión en Google Play ni en ningún servicio.</li>
+          <li><strong>NO</strong> ingreses correos, contraseñas ni datos personales.</li>
+          <li>Usa esta beta solamente para probar GDLite Web Edition.</li>
         </ul>
       </div>
       <div class="modal-footer">
-        <button id="btn-accept" class="btn-primary">¡Entendido, empezar a jugar!</button>
+        <button id="btn-accept" class="btn-primary">¡Entendido, empezar a probar!</button>
       </div>
     </div>
   </div>
 
+  <!-- Estado de conexión -->
+  <div id="connection-status" class="connection-status" data-state="idle" role="status" aria-live="polite">
+    Esperando confirmación de seguridad…
+  </div>
+
   <!-- Marca de Agua / Watermark -->
   <div class="watermark">
-    <strong>Played on GD Lite Web Edition</strong>
+    <strong>GDLite Web Edition — BETA</strong>
     <small>github.com/anyelo888ra-ux/gd-lite-web-opensorce</small>
   </div>
 
-  <!-- Contenedor del Juego -->
+  <!-- Contenedor del emulador -->
   <main class="game-container">
     <div id="stream-player">
-      <p id="placeholder-text">Esperando confirmación de seguridad...</p>
+      <p id="placeholder-text">Esperando confirmación de seguridad…</p>
     </div>
   </main>
 
