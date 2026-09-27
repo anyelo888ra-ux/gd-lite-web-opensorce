@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const streamPlayer = document.getElementById('stream-player');
   const connectionStatus = document.getElementById('connection-status');
 
-  // The Android backend is not hosted by GitHub Pages.
-  // Keep the frontend usable until an Android streaming server is configured.
-  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || '';
+  // GitHub Pages only hosts the frontend. A real Android streaming backend
+  // can be supplied with window.GDLITE_EMULATOR_URL.
+  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || './emulator/';
 
   function setStatus(message, state = 'loading') {
     if (!connectionStatus) return;
@@ -14,12 +14,12 @@ document.addEventListener('DOMContentLoaded', () => {
     connectionStatus.dataset.state = state;
   }
 
-  function showBackendUnavailable() {
+  function showBackendPlaceholder() {
     streamPlayer.innerHTML = `
       <div class="emulator-offline">
         <h2>Android emulator no disponible</h2>
         <p>La página web está funcionando, pero todavía no hay un servidor Android conectado.</p>
-        <small>El emulador se conectará aquí cuando configuremos el backend de streaming.</small>
+        <small>La ruta de prueba está disponible mientras configuramos el backend de streaming.</small>
       </div>
     `;
 
@@ -28,11 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function loadEmulator() {
-    if (!EMULATOR_URL) {
-      showBackendUnavailable();
-      return;
-    }
-
     setStatus('Conectando con Android…', 'loading');
     streamPlayer.innerHTML = '';
 
@@ -52,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     iframe.addEventListener('error', () => {
       setStatus('No se pudo conectar con Android.', 'error');
       console.error('[GDLite] Android endpoint failed:', EMULATOR_URL);
+      showBackendPlaceholder();
     });
 
     streamPlayer.appendChild(iframe);
@@ -63,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   btnAccept.addEventListener('click', () => {
-    modal.style.display = 'none';
+    if (modal) modal.style.display = 'none';
     loadEmulator();
   });
 });
