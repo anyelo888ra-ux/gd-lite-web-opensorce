@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: gd-lite-backend
+    env: docker
+    plan: free
+    dockerfilePath: Dockerfile
+    healthCheckPath: /
