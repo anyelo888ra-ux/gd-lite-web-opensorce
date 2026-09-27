@@ -4,9 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const streamPlayer = document.getElementById('stream-player');
   const connectionStatus = document.getElementById('connection-status');
 
-  // The Android streaming endpoint is supplied by the deployment.
-  // Render is no longer hard-coded here.
-  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || '/emulator/';
+  // The Android backend is not hosted by GitHub Pages.
+  // Keep the frontend usable until an Android streaming server is configured.
+  const EMULATOR_URL = window.GDLITE_EMULATOR_URL || '';
 
   function setStatus(message, state = 'loading') {
     if (!connectionStatus) return;
@@ -14,9 +14,26 @@ document.addEventListener('DOMContentLoaded', () => {
     connectionStatus.dataset.state = state;
   }
 
-  function loadEmulator() {
-    setStatus('Conectando con Android…', 'loading');
+  function showBackendUnavailable() {
+    streamPlayer.innerHTML = `
+      <div class="emulator-offline">
+        <h2>Android emulator no disponible</h2>
+        <p>La página web está funcionando, pero todavía no hay un servidor Android conectado.</p>
+        <small>El emulador se conectará aquí cuando configuremos el backend de streaming.</small>
+      </div>
+    `;
 
+    setStatus('Esperando servidor Android…', 'error');
+    console.warn('[GDLite] No Android streaming endpoint configured.');
+  }
+
+  function loadEmulator() {
+    if (!EMULATOR_URL) {
+      showBackendUnavailable();
+      return;
+    }
+
+    setStatus('Conectando con Android…', 'loading');
     streamPlayer.innerHTML = '';
 
     const iframe = document.createElement('iframe');
