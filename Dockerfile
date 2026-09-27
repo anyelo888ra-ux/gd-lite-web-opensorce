@@ -1,12 +1,17 @@
 FROM budtmo/docker-android:emulator_11.0
 
-# Interfaz web/noVNC y ADB
+# Web/noVNC and ADB
 EXPOSE 6080 5555
 
 ENV PORT=6080
 ENV KVM=false
 ENV DEVICE="Samsung Galaxy S6"
+ENV APK_PATH="/scripts/gd-lite.apk"
+ENV ANDROID_PACKAGE="com.robtopx.geometryjumplite"
 
-# El APK se proporciona externamente en /scripts/gd-lite.apk.
-# No se incluye el APK propietario en el repositorio.
-CMD ["/bin/bash", "-c", "web-server & entrypoint.sh"]
+# The APK is supplied separately and is not distributed by this repository.
+COPY scripts/start-gdlite.sh /scripts/start-gdlite.sh
+RUN chmod +x /scripts/start-gdlite.sh
+
+# Start Android, expose noVNC, then install/launch the supplied APK when present.
+CMD ["/scripts/start-gdlite.sh"]
