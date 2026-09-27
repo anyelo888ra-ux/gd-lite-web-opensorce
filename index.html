@@ -2,14 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="GDLite Web Edition - beta de emulación Android en el navegador.">
   <title>GDLite Web Edition - Beta</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
-  <!-- Modal de Advertencia de Seguridad -->
   <div id="security-modal" class="modal-overlay">
     <div class="modal-card">
       <div class="modal-header">
@@ -30,24 +28,53 @@
     </div>
   </div>
 
-  <!-- Estado de conexión -->
   <div id="connection-status" class="connection-status" data-state="idle" role="status" aria-live="polite">
     Esperando confirmación de seguridad…
   </div>
 
-  <!-- Marca de Agua / Watermark -->
+  <aside class="status-panel" aria-label="Estado del backend">
+    <strong>GDLite Backend</strong>
+    <span id="android-state">Android: —</span>
+    <span id="adb-state">ADB: —</span>
+    <span id="stream-state">Streaming: —</span>
+  </aside>
+
   <div class="watermark">
     <strong>GDLite Web Edition — BETA</strong>
     <small>github.com/anyelo888ra-ux/gd-lite-web-opensorce</small>
   </div>
 
-  <!-- Contenedor del emulador -->
   <main class="game-container">
     <div id="stream-player">
       <p id="placeholder-text">Esperando confirmación de seguridad…</p>
     </div>
+
+    <div class="mobile-controls" aria-label="Controles táctiles">
+      <button type="button" data-key="Space" aria-label="Saltar">▲</button>
+      <button type="button" data-key="ArrowLeft" aria-label="Izquierda">◀</button>
+      <button type="button" data-key="ArrowRight" aria-label="Derecha">▶</button>
+    </div>
   </main>
 
+  <script>
+    document.querySelectorAll('.mobile-controls button').forEach((button) => {
+      const key = button.dataset.key;
+
+      button.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        window.dispatchEvent(new KeyboardEvent('keydown', { key, code: key }));
+      });
+
+      button.addEventListener('pointerup', (event) => {
+        event.preventDefault();
+        window.dispatchEvent(new KeyboardEvent('keyup', { key, code: key }));
+      });
+
+      button.addEventListener('pointercancel', () => {
+        window.dispatchEvent(new KeyboardEvent('keyup', { key, code: key }));
+      });
+    });
+  </script>
   <script src="app.js"></script>
 </body>
 </html>
