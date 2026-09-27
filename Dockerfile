@@ -1,18 +1,11 @@
-FROM redroid/redroid:11.0.0-latest
+FROM budtmo/docker-android:emulator_11.0
 
-# Instalar netcat / curl para mantener el proceso web activo si es necesario
-USER root
-
-# Puertos expuestos para ADB, Scrcpy Web y Web Service de Render
-EXPOSE 5555 8000 10000
+# Puertos expuestos para la interfaz web y servicios
+EXPOSE 6080 5555
 
 # Variables de entorno por defecto
-ENV REDROID_FPS=60
-ENV PORT=8000
-
-# Desactivar explícitamente el requisito de KVM para entornos cloud
+ENV PORT=6080
 ENV KVM=false
 
-# Comando de inicio corregido
-ENTRYPOINT ["/init"]
-CMD ["androidboot.hardware=redroid", "redroid.width=1280", "redroid.height=720", "redroid.fps=60"]
+# Comando para iniciar la interfaz web del emulador
+CMD ["/bin/bash", "-c", "web-server & ./entrypoint.sh"]
