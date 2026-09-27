@@ -14,4 +14,5 @@ ENV PORT=8000
 ENV KVM=false
 
 # Comando de inicio corregido
-CMD ["sh", "-c", "redroid androidboot.hardware=redroid redroid.width=1280 redroid.height=720 redroid.fps=60 & tail -f /dev/null"]
+ENTRYPOINT ["/init"]
+CMD ["androidboot.hardware=redroid", "redroid.width=1280", "redroid.height=720", "redroid.fps=60"]
