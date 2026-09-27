@@ -1,11 +1,11 @@
 FROM budtmo/docker-android:emulator_11.0
 
-# Puertos expuestos para la interfaz web y servicios
-EXPOSE 6080 5555
-
-# Variables de entorno por defecto
+# Puerto de interfaz web asignado por Render
 ENV PORT=6080
+EXPOSE 6080
+
+# Desactivar requerimiento de KVM para entorno Render
 ENV KVM=false
 
-# Comando para iniciar la interfaz web del emulador
-CMD ["/bin/bash", "-c", "web-server & ./entrypoint.sh"]
+# Comando para iniciar el emulador y el servidor web integrado
+CMD ["/src/entrypoint.sh"]
